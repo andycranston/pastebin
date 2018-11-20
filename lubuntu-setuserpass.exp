@@ -1,0 +1,234 @@
+#! /usr/local/bin/expect --
+#
+# @(#--!) @(#) lubuntu-setuserpass.exp, version 001, 03-december-2017
+#
+# log with ssh into a lubuntu host as user localadm with specified
+# password - su to root (use same password) and run
+# passwd command as root to set a non-root user (specified) pasword
+#
+
+# ----------------------------------------------------------------
+
+proc usage {} {
+  global progname
+
+  send_error "$progname: usage:\n"
+  send_error "\t$progname hostname localadmpass username newuserpass\n"
+}
+
+# ----------------------------------------------------------------
+
+#
+# Main
+#
+
+# get program/script name
+set progname [file tail $argv0]
+
+# error message if no command line arguments
+if {[llength $argv] == 0} {
+  send_error "$progname: no arguments given on command line\n"
+  usage
+  exit 1
+}
+
+# error message if incorrect number of command line arguments
+if {[llength $argv] != 4} {
+  send_error "$progname: incorrect number of arguments on command line\n"
+  usage
+  exit 1
+}
+
+# extract command line arguments
+set hostname [lindex $argv 0]
+set localadmpass [lindex $argv 1]
+set username [lindex $argv 2]
+set newuserpass [lindex $argv 3]
+
+# start the secure shell process
+spawn ssh localadm@[set hostname]
+
+# wait for and deal with initial login prompt
+while {1} {
+  expect {
+    "localadm*password: " {
+      break
+    }
+    "The authenticity of host*can't be established*Are you sure you want to co
+ntinue connecting (yes/no)? " {
+      send "yes\r"
+      continue
+    }
+    "ssh: connect to host*Connection refused" {
+      send_error "$progname: connection refused\n"
+      exit 1
+    }
+    timeout {
+      send_error "$progname: timeout waiting for initial password prompt\n"
+      exit 1
+    }
+    eof {
+      send_error "$progname: eof waiting for initial password prompt\n"
+      exit 1
+    }
+  }
+}
+
+# send the password
+send "$localadmpass\r"
+
+# wait for initial UNIX prompt
+expect {
+  "localadm*$ " {
+    # fall through
+  }
+  "Permission denied, please try again." {
+    send_error "$progname: incorrect password\n"
+    exit 1
+  }
+  timeout {
+    send_error "$progname: timeout waiting for initial localadm prompt\n"
+    exit 1
+  }
+  eof {
+    send_error "$progname: eof waiting for initial localadm prompt\n"
+    exit 1
+  }
+}
+
+# send the su command to become root
+send "sudo su\r"
+
+# wait for initial sudo UNIX prompt
+expect {
+  " password for localadm: " {
+    # fall through
+  }
+  "Permission denied, please try again." {
+    send_error "$progname: incorrect password\n"
+    exit 1
+  }
+  timeout {
+    send_error "$progname: timeout waiting for sudo password prompt\n"
+    exit 1
+  }
+  eof {
+    send_error "$progname: eof waiting for sudo password prompt\n"
+    exit 1
+  }
+}
+
+# send the password again
+send "$localadmpass\r"
+
+# wait for the root prompt
+expect {
+  "root*# " {
+    # fall through
+  }
+  "Permission denied, please try again." {
+    send_error "$progname: incorrect password\n"
+    exit 1
+  }
+  timeout {
+    send_error "$progname: timeout waiting for initial root prompt\n"
+    exit 1
+  }
+  eof {
+    send_error "$progname: eof waiting for initial root prompt\n"
+    exit 1
+  }
+}
+
+# send the passwd command
+send "passwd $username\r"
+
+# wait for the new password prompt
+expect {
+  "Enter new UNIX password: " {
+    # fall through
+  }
+  timeout {
+    send_error "$progname: timeout waiting for new password prompt\n"
+    exit 1
+  }
+  eof {
+    send_error "$progname: eof waiting for new password prompt\n"
+    exit 1
+  }
+}
+
+# send the new password
+send "$newuserpass\r"
+
+# wait for the confirm password prompt
+expect {
+  "Retype new UNIX password: " {
+    # fall through
+  }
+  timeout {
+    send_error "$progname: timeout waiting for retype password prompt\n"
+    exit 1
+  }
+  eof {
+    send_error "$progname: eof waiting for retype password prompt\n"
+    exit 1
+  }
+}
+
+# send the new password again
+send "$newuserpass\r"
+
+# wait for the root prompt again
+expect {
+  "root*# " {
+    # fall through
+  }
+  "Permission denied, please try again." {
+    send_error "$progname: incorrect password\n"
+    exit 1
+  }
+  timeout {
+    send_error "$progname: timeout waiting for second root prompt\n"
+    exit 1
+  }
+  eof {
+    send_error "$progname: eof waiting for second root prompt\n"
+    exit 1
+  }
+}
+
+# send exit to go back to being localadm
+send "exit\r"
+
+# wait for localadm UNIX prompt
+expect {
+  "localadm*$ " {
+    # fall through
+  }
+  timeout {
+    send_error "$progname: timeout waiting for going back to localadm prompt\n"
+    exit 1
+  }
+  eof {
+    send_error "$progname: eof waiting for going back to localadm prompt\n"
+    exit 1
+  }
+}
+
+# send exit again to logout and finish ssh session
+send "exit\r"
+
+# now wait for eof which is expected (no pun intended!)
+expect {
+  eof {
+    # fall through
+  }
+  timeout {
+    send_error "$progname: timeout waiting for ssh to exit\n"
+    exit 1
+  }
+}
+
+# exit with success
+exit 0
