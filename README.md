@@ -36,6 +36,11 @@ test data file containing historic records of flood levels of the nile
 
 CGI scripts in Python to reformat a CSV file
 
+### sbxml.py
+
+a CGI Python utility to analyse Hewlett Packard XML files
+from their sales/smart portal
+
 ### snmptrapRECV.c
 
 SNMP trap receiver written in C
