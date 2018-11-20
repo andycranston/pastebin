@@ -12,6 +12,18 @@ converting fractional part of a float to binary in Python
 
 expect script to login to a lubunt host and set a user password
 
+### muc.cmd
+
+input file for the muc.py program
+
+### muc.py
+
+started but not finished Modbus client over UDP
+
+### mue.py
+
+started but not finished Modbus server emulator over UDP
+
 ### monopng.py
 
 Python code to create a monochrome PNG file
@@ -19,6 +31,10 @@ Python code to create a monochrome PNG file
 ### nile.csv
 
 test data file containing historic records of flood levels of the nile
+
+### recsv.py, recsv2.py and recsv3.py
+
+CGI scripts in Python to reformat a CSV file
 
 ### snmptrapRECV.c
 
