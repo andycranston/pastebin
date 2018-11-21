@@ -45,6 +45,11 @@ from their sales/smart portal
 
 SNMP trap receiver written in C
 
+### socomec-reset-ksh.sh
+
+a shell script to reset counters on a Socomec power
+distribution unit
+
 -----------------
 
 end of file
