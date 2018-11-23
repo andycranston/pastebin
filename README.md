@@ -8,6 +8,11 @@ Code snippits, file templates, text notes and other random stuff
 
 converting fractional part of a float to binary in Python
 
+### ipwatcher.sh
+
+script that uses the fping command to see pingable IP addresses appear
+and disappear on a network segment
+
 ### lubuntu-setuserpass.exp
 
 expect script to login to a lubunt host and set a user password
