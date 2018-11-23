@@ -50,6 +50,20 @@ SNMP trap receiver written in C
 a shell script to reset counters on a Socomec power
 distribution unit
 
+### squidauth.c
+
+a simple Squid proxy authentication module written in C.  good
+to prove Squid is calling the module.
+
+### testfile.c
+
+simple C program to generate test data files of a required size
+
+### timestable.c
+
+example program to ask times table questions but real purpose is to
+show timeout with C setjmp.h functions
+
 -----------------
 
 end of file
